@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>정신연령 테스트 | 나의 내면은 몇 살?</title>
     <style>
-        /* Instagram Style CSS */
+        /* Instagram Style CSS with Dark Mode */
         :root {
             --primary-color: #0095f6;
             --bg-color: #fafafa;
@@ -13,10 +13,25 @@
             --text-main: #262626;
             --text-sub: #8e8e8e;
             --border: #dbdbdb;
+            --progress-base: #eee;
+            --btn-bg: #fff;
+            --btn-hover: #efefef;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        /* Dark Mode Specific Variables */
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f0f0f0;
+            --text-sub: #a0a0a0;
+            --border: #333333;
+            --progress-base: #333;
+            --btn-bg: #2a2a2a;
+            --btn-hover: #3a3a3a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background 0.3s, color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; }
 
         .container {
             width: 100%;
@@ -27,18 +42,34 @@
             padding: 40px 20px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
         }
 
         h1 { font-size: 24px; margin-bottom: 10px; color: var(--text-main); }
         p.desc { font-size: 14px; color: var(--text-sub); margin-bottom: 30px; }
 
+        /* Dark Mode Toggle Button */
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-main);
+            padding: 0;
+            margin: 0;
+            transition: color 0.3s;
+        }
+
         /* Progress Bar */
-        .progress-container { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; display: none; }
+        .progress-container { width: 100%; height: 6px; background: var(--progress-base); border-radius: 10px; margin-bottom: 30px; overflow: hidden; display: none; }
         .progress-bar { height: 100%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 0%; transition: 0.3s; }
 
         /* Question Section */
         #quiz { display: none; }
-        .question-box { font-size: 18px; font-weight: 600; margin-bottom: 30px; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+        .question-box { font-size: 18px; font-weight: 600; margin-bottom: 30px; min-height: 60px; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
 
         /* Buttons */
         .btn-group { display: flex; flex-direction: column; gap: 12px; }
@@ -46,13 +77,14 @@
             padding: 12px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            background: #fff;
+            background: var(--btn-bg);
+            color: var(--text-main);
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
-        button:hover { background-color: #efefef; }
+        button:hover { background-color: var(--btn-hover); }
         button.primary { background-color: var(--primary-color); color: white; border: none; margin-top: 10px; }
         button.primary:hover { background-color: #1877f2; }
 
@@ -60,7 +92,7 @@
         #result { display: none; }
         .result-title { font-size: 14px; color: var(--text-sub); margin-bottom: 8px; }
         .result-name { font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px; }
-        .result-desc { font-size: 15px; line-height: 1.6; margin-bottom: 30px; color: #444; }
+        .result-desc { font-size: 15px; line-height: 1.6; margin-bottom: 30px; color: var(--text-main); }
         .share-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         .share-btns button { flex: 1; }
 
@@ -71,6 +103,8 @@
 <body>
 
 <div class="container">
+    <button id="theme-toggle" onclick="toggleDarkMode()">🌙</button>
+
     <div id="start-screen">
         <img src="https://cdn-icons-png.flaticon.com/512/3991/3991444.png" alt="icon">
         <h1>정신연령 테스트</h1>
@@ -103,6 +137,21 @@
 </div>
 
 <script>
+    // 다크모드 토글 함수
+    function toggleDarkMode() {
+        const body = document.body;
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        body.classList.toggle('dark-mode');
+        
+        // 버튼 아이콘 변경 (달 🌙 <=> 해 ☀️)
+        if (body.classList.contains('dark-mode')) {
+            toggleBtn.innerText = '☀️';
+        } else {
+            toggleBtn.innerText = '🌙';
+        }
+    }
+
     const questions = [
         "1. 가끔 이유 없이 눈물이 날 때가 있다.",
         "2. 유행하는 신조어는 꼭 찾아서 써봐야 직성이 풀린다.",

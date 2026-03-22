@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정신연령 테스트 | 나의 내면은 몇 살?</title>
+    <style>
+        /* Instagram Style CSS */
+        :root {
+            --primary-color: #0095f6;
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-main: #262626;
+            --text-sub: #8e8e8e;
+            --border: #dbdbdb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-size: 24px; margin-bottom: 10px; color: var(--text-main); }
+        p.desc { font-size: 14px; color: var(--text-sub); margin-bottom: 30px; }
+
+        /* Progress Bar */
+        .progress-container { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 30px; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 0%; transition: 0.3s; }
+
+        /* Question Section */
+        #quiz { display: none; }
+        .question-box { font-size: 18px; font-weight: 600; margin-bottom: 30px; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+
+        /* Buttons */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+        button {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #efefef; }
+        button.primary { background-color: var(--primary-color); color: white; border: none; margin-top: 10px; }
+        button.primary:hover { background-color: #1877f2; }
+
+        /* Result Section */
+        #result { display: none; }
+        .result-title { font-size: 14px; color: var(--text-sub); margin-bottom: 8px; }
+        .result-name { font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px; }
+        .result-desc { font-size: 15px; line-height: 1.6; margin-bottom: 30px; color: #444; }
+        .share-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .share-btns button { flex: 1; }
+
+        /* Start Screen */
+        #start-screen img { width: 80px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="start-screen">
+        <img src="https://cdn-icons-png.flaticon.com/512/3991/3991444.png" alt="icon">
+        <h1>정신연령 테스트</h1>
+        <p class="desc">질문에 솔직하게 답하고<br>나의 진짜 정신연령을 확인해보세요.</p>
+        <button class="primary" style="width: 100%;" onclick="startQuiz()">테스트 시작하기</button>
+    </div>
+
+    <div id="quiz">
+        <div class="progress-container" id="progress-box">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="question-box" id="question">질문이 여기에 표시됩니다.</div>
+        <div class="btn-group">
+            <button onclick="nextQuestion(3)">네</button>
+            <button onclick="nextQuestion(2)">가끔</button>
+            <button onclick="nextQuestion(1)">아니오</button>
+        </div>
+    </div>
+
+    <div id="result">
+        <p class="result-title">나의 정신연령 결과는?</p>
+        <div class="result-name" id="result-name">결과 명칭</div>
+        <p class="result-desc" id="result-desc">결과에 대한 설명이 들어갑니다.</p>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+        <div class="share-btns">
+            <button onclick="location.reload()">다시 하기</button>
+            <button onclick="alert('결과가 복사되었습니다! (가짜 기능)')" style="background: #262626; color: white;">공유하기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "1. 가끔 이유 없이 눈물이 날 때가 있다.",
+        "2. 유행하는 신조어는 꼭 찾아서 써봐야 직성이 풀린다.",
+        "3. 주말에는 나가는 것보다 집에서 쉬는 게 제일 좋다.",
+        "4. 내가 또래보다 더 어른스럽다고 느껴질 때가 많다.",
+        "5. 건강식품이나 비타민을 챙겨 먹기 시작했다.",
+        "6. 최신 가요보다 옛날 노래가 더 좋게 들린다.",
+        "7. 감정 조절이 예전보다 쉬워진 것 같다.",
+        "8. 시끄러운 장소보다 조용한 카페가 더 편하다.",
+        "9. 책임져야 할 일이 생기는 것이 가끔 두렵다.",
+        "10. 인생에서 가장 중요한 것은 '즐거움'이라고 생각한다."
+    ];
+
+    let currentIdx = 0;
+    let totalScore = 0;
+
+    function startQuiz() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        document.getElementById('progress-box').style.display = 'block';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        document.getElementById('question').innerText = questions[currentIdx];
+        const progress = ((currentIdx) / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+    }
+
+    function nextQuestion(score) {
+        totalScore += score;
+        currentIdx++;
+
+        if (currentIdx < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('progress-box').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+
+        let name = "";
+        let desc = "";
+
+        // 점수 계산 (최소 10점 ~ 최대 30점)
+        if (totalScore <= 15) {
+            name = "순수함 폭발! 초딩 수준";
+            desc = "세상을 보는 눈이 맑고 투명하시군요! 호기심이 많고 작은 것에도 즐거움을 느끼는 당신은 마음만은 영원한 어린이입니다.";
+        } else if (totalScore <= 21) {
+            name = "질풍노도! 중고딩 수준";
+            desc = "감수성이 풍부하고 트렌드에 민감하시네요. 때로는 진지하지만, 여전히 에너지가 넘치고 열정적인 상태입니다.";
+        } else if (totalScore <= 26) {
+            name = "갓생 사는 중! 직장인 수준";
+            desc = "현실을 직시하고 책임감을 느끼기 시작한 단계입니다. 휴식의 소중함을 알며, 적절한 균형을 찾으려 노력하고 있네요.";
+        } else {
+            name = "해탈의 경지! 어르신 수준";
+            desc = "인생의 쓴맛 단맛을 다 아는 당신! 웬만한 일에는 동요하지 않는 평온한 마음을 가지셨군요. 겉모습과 달리 내면은 이미 은퇴 준비 완료?";
+        }
+
+        document.getElementById('result-name').innerText = name;
+        document.getElementById('result-desc').innerText = desc;
+    }
+</script>
+
+</body>
+</html>
